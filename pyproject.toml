@@ -1,0 +1,32 @@
+[project]
+name = "mcp-ffmpeg-tools"
+version = "0.1.0"
+description = "An MCP server for executing FFmpeg commands and validating them against source code"
+authors = [
+    {name = "Gamhoi", email = "gamhoi.chan@gmail.com"}
+]
+dependencies = [
+    "requests",
+    "typing-extensions",
+    "pydantic",
+    "mcp",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["hatchling", "requests"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project.scripts]
+ffmpeg-tools = "ffmpeg_mcp.mcp:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ffmpeg_mcp"]
+
+[tool.hatch.build.hooks.custom]
+path = "scripts/build_ffmpeg.py"
