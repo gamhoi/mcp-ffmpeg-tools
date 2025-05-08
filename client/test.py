@@ -30,7 +30,6 @@ async def handle_sampling_message(
         stopReason="endTurn",
     )
 
-
 async def run():
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(
@@ -43,12 +42,6 @@ async def run():
             prompts = await session.list_prompts()
             print(f"prompts: {prompts}")
 
-            # Get a prompt
-            # prompt = await session.get_prompt(
-            #     "analyze_ffmpeg_source", arguments={"path": "libswscale/options.c"}
-            # )
-            # print(f"prompt: {prompt}")
-
             # List available resources
             resources = await session.list_resources()
             print(f"resources: {resources}")
@@ -60,14 +53,21 @@ async def run():
             tools = await session.list_tools()
             print(f"tools: {tools}")
 
-            # import urllib.parse
-            # Read a resource
-            # content, mime_type = await session.read_resource("ffmpeg-source://")
-            # print(f"content: {content}, mime_type: {mime_type}")
-
-            # Call a tool
+            # Call get_ffmpeg_source_code
             result = await session.call_tool("get_ffmpeg_source_code", arguments={"path": "/libavfilter/src_movie.c"})
             print(f"result: {result}")
+
+            # Call get_screenshot
+            result = await session.call_tool("get_screenshot", arguments={"file_path": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "timestamp": "00:00:20"})
+            # Save the result to a file
+            import base64
+            content = result.content[0]
+            if isinstance(content, types.ImageContent):
+                decoded = base64.b64decode(content.data)
+                with open("screenshot.png", "wb") as f:
+                    f.write(decoded)
+            else:
+                print(f"result: {result}")
 
 
 if __name__ == "__main__":

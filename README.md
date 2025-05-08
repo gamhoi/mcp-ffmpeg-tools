@@ -91,6 +91,7 @@ uv run python3 client/test.py
 Help me perform media conversion tasks using FFmpeg. You can:
 - use tool:execute_ffmpeg to run FFmpeg commands
 - use tool:execute_ffprobe to inspect results (e.g., resolution, bitrate)
+- use tool:get_screenshot to inspect results (e.g., video layout, quality)
 - use tool:ls_ffmpeg_source_code and tool:get_ffmpeg_source_code to validate commands using FFmpeg source code
 ```
 

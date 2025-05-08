@@ -1,0 +1,3 @@
+ffmpeg_src/
+uv.lock
+*/__pycache__/

@@ -7,12 +7,13 @@ import json
 import logging
 import sys
 import os
+import io
 # import asyncio
 import subprocess
 from pathlib import Path
 # from urllib.parse import quote, unquote
 from typing import Dict, Any, Optional, Annotated
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import FastMCP, Image
 from mcp.server.fastmcp.prompts.base import Message
 
 ffmpeg_src_root = str(Path(__file__).resolve().parent.parent) + "/ffmpeg_src/"
@@ -105,7 +106,38 @@ def ls_ffmpeg_source_code(path: str) -> list[str]:
         
         return files
     except Exception as e:
-        return f"Error reading file: {str(e)}"
+        raise RuntimeError(f"Error reading file: {str(e)}")
+
+@mcp.tool("get_screenshot", description="Get a screenshot from a media file at a given timestamp. Parameters: file path and timestamp (format '00:00:00'). Return an Image object.")
+def get_screenshot(file_path: str, timestamp: str) -> Image:
+    """
+    Extract a screenshot from a media file at the specified timestamp and return as an Image.
+    """
+    # Build ffmpeg command to output PNG to stdout
+    cmd = [
+        "ffmpeg",
+        "-ss", timestamp,  # seek to timestamp
+        "-i", file_path,
+        "-frames:v", "1",  # extract one frame
+        "-f", "image2pipe",
+        "-vcodec", "png",
+        "-v", "error",
+        "-y",
+        "-"
+    ]
+    try:
+        proc = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False
+        )
+        if proc.returncode != 0 or not proc.stdout:
+            raise RuntimeError(f"ffmpeg error: {proc.stderr}")
+        # Return as Image (in-memory bytes)
+        return Image(data=proc.stdout, format="png")
+    except Exception as e:
+        raise RuntimeError(f"Failed to extract screenshot: {e}")
 
 def main():
     """
